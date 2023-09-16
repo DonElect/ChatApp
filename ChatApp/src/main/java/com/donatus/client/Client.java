@@ -1,6 +1,7 @@
 package com.donatus.client;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -39,6 +40,7 @@ public class Client {
                 }else System.out.println("Can not send an empty message!");
             }
         }catch (IOException e){
+            System.out.println("CONNECTION LOST!");
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
@@ -56,6 +58,7 @@ public class Client {
                             System.out.println(messageFromGroupChat);
                     }catch (IOException e){
                         closeEverything(socket, bufferedReader, bufferedWriter);
+                        break;
                     }
                 }
             }
@@ -80,9 +83,10 @@ public class Client {
         System.out.print("Enter your username for the group chat: ");
         String username = sc.nextLine();
 
-        Socket socket = new Socket("localhost", 5000);
-        Client client = new Client(socket, username);
-        client.listenForMessage();
-        client.sendMessage();
+        try(Socket socket = new Socket("localhost", 5000)) {
+            Client client = new Client(socket, username);
+            client.listenForMessage();
+            client.sendMessage();
+        }
     }
 }
